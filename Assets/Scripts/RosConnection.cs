@@ -9,16 +9,17 @@ using Int32 = RosSharp.RosBridgeClient.Messages.Standard.Int32;
 using Random = System.Random;
 using Time = RosSharp.RosBridgeClient.Messages.Standard.Time;
 
-public class RosConnectionDemo : MonoBehaviour
+public class RosConnection : MonoBehaviour
 {
     private RosSocket m_Socket;
-    private int m_Counter = 0;
+
+    public static RosSocket RosConnectionSocket =>
+        GameObject.Find("RosConnection").GetComponent<RosConnector>().RosSocket;
 
     void Start()
     {
         RosConnector connector = GetComponent<RosConnector>();
         m_Socket = connector.RosSocket;
-        m_Socket.Subscribe<Int32>("/topic", msg => { Debug.Log(msg.data); });
         m_Socket.Subscribe<ArmMotorCommand>("/arm_control_data", msg =>
         {
             for (int i = 0; i < 6; i++)
@@ -26,17 +27,24 @@ public class RosConnectionDemo : MonoBehaviour
                 Debug.Log($"Velocity output of motor #{i} is {msg.MotorVel[i]}");
             }
         });
-        m_Socket.Advertise<Int32>("/topic");
         m_Socket.Advertise<ProcessedControllerInput>("/processed_arm_controller_input");
+        m_Socket.Advertise<WheelSpeed>("/WheelSpeed");
+        //m_Socket.Advertise<WheelSpeed>("/TestTopic");
+        //m_Socket.Subscribe<WheelSpeed>("/WheelSpeed", speed =>
+        //{
+        //    Debug.Log(speed.Wheel_Speed[0]);
+        //    Debug.Log(speed.Wheel_Speed[1]);
+        //});
+        //m_Socket.Subscribe<WheelSpeed>("/TestTopic", num =>
+        //{
+        //    //Debug.Log(num.Wheel_Speed);
+        //});
     }
 
     private static readonly Random s_RandomInstance = new Random();
 
     void Update()
     {
-        m_Socket.Publish("/topic", new Int32() {data = m_Counter});
-        m_Counter++;
-
         float[] randomInput = new float[6];
         for (int i = 0; i < 6; i++)
         {
@@ -47,5 +55,12 @@ public class RosConnectionDemo : MonoBehaviour
         {
             ControllerInput = randomInput
         });
+
+        m_Socket.Publish("/WheelSpeed", new WheelSpeed
+        {
+            Wheel_Speed = new[] { 5.0f, 5.0f }
+        });
+
+        //m_Socket.Publish("/TestTopic", new WheelSpeed());
     }
 }

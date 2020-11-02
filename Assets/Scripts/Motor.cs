@@ -19,8 +19,19 @@ public class Motor : MonoBehaviour
     void Start()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
-        //rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY;
-        HingeJoint joint = GetComponent<HingeJoint>();
+        rb.maxAngularVelocity = float.MaxValue;
+        
+        InvokeRepeating("CheckWheelSpeed", 5.0f, 1.0f);
+    }
+
+    void CheckWheelSpeed()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        float currentAngularSpeed = Vector3.Project(rb.angularVelocity, transform.forward).magnitude;
+        if (Mathf.Abs(currentAngularSpeed - Mathf.Abs(m_AngularSpeed)) > 1.0f)
+        {
+            Debug.LogWarning($"Wheel speed above / below from target: {currentAngularSpeed}");
+        }
     }
 
     void Update()
@@ -30,32 +41,46 @@ public class Motor : MonoBehaviour
         //Debug.Log(rb.angularVelocity);
         //Debug.Log(Vector3.Cross(rb.angularVelocity.normalized, transform.forward.normalized).magnitude);
         float currentAngularSpeed = Vector3.Project(rb.angularVelocity, transform.forward).magnitude;
-        switch (name)
+        //switch (name)
+        //{
+        //    //Debug.Log(currentAngularSpeed);
+        //    //rb.AddTorque(new Vector3(0.0f, 0.0f, 100.0f), ForceMode.Force);
+        //    case "WheelFL":
+        //    case "WheelRL":
+        //    {
+        //        //Debug.Log(transform.localEulerAngles);
+        //        Vector3 angles = transform.localEulerAngles;
+        //        angles.x = 90.0f;
+        //        transform.localEulerAngles = angles;
+        //        break;
+        //    }
+        //    case "WheelFR":
+        //    case "WheelRR":
+        //    {
+        //        //Debug.Log(transform.localEulerAngles);
+        //        Vector3 angles = transform.localEulerAngles;
+        //        angles.x = -90.0f;
+        //        transform.localEulerAngles = angles;
+        //        break;
+        //    }
+        //    default:
+        //    {
+        //        Debug.Break();
+        //        break;
+        //    }
+        //}
+        if (m_AngularSpeed > 0.0f)
         {
-            //Debug.Log(currentAngularSpeed);
-            //rb.AddTorque(new Vector3(0.0f, 0.0f, 100.0f), ForceMode.Force);
-            case "WheelFL":
-            case "WheelRL":
+            if (currentAngularSpeed < m_AngularSpeed)
             {
-                //Debug.Log(transform.localEulerAngles);
-                Vector3 angles = transform.localEulerAngles;
-                angles.x = 90.0f;
-                transform.localEulerAngles = angles;
-                break;
-            }
-            case "WheelFR":
-            case "WheelRR":
-            {
-                //Debug.Log(transform.localEulerAngles);
-                Vector3 angles = transform.localEulerAngles;
-                angles.x = -90.0f;
-                transform.localEulerAngles = angles;
-                break;
-            }
-            default:
-            {
-                Debug.Break();
-                break;
+                if (gameObject.name == "WheelRR" || gameObject.name == "WheelFR")
+                {
+                    rb.AddRelativeTorque(new Vector3(0.0f, 0.0f, -20.0f), ForceMode.Force);
+                }
+                else
+                {
+                    rb.AddRelativeTorque(new Vector3(0.0f, 0.0f, 20.0f), ForceMode.Force);
+                }
             }
         }
     }
