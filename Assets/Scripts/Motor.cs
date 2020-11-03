@@ -83,11 +83,11 @@ public class Motor : MonoBehaviour
 [CanEditMultipleObjects]
 public class MotorEditor : Editor
 {
-    SerializedProperty InvertRotationDirection;
-    SerializedProperty TargetAngularSpeedOverride;
-    SerializedProperty TargetAngularSpeed;
-    SerializedProperty MaxAngularSpeed;
-    SerializedProperty MinAngularSpeed;
+    private SerializedProperty InvertRotationDirection;
+    private SerializedProperty TargetAngularSpeedOverride;
+    private SerializedProperty TargetAngularSpeed;
+    private SerializedProperty MaxAngularSpeed;
+    private SerializedProperty MinAngularSpeed;
 
     void OnEnable()
     {
