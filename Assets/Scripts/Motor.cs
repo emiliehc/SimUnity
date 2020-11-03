@@ -37,8 +37,6 @@ public class Motor : MonoBehaviour
         }
     }
 
-    public float TestProp;
-
     void Start()
     {
         Rigidbody rb = GetComponent<Rigidbody>();
