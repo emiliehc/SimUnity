@@ -39,9 +39,9 @@ public class RoverController : MonoBehaviour
             m_InputWheelSpeeds = default;
         }
 
-        m_Wheels[0].GetComponent<Motor>().AngularSpeedAbsolute = speeds.First.First;
-        m_Wheels[1].GetComponent<Motor>().AngularSpeedAbsolute = speeds.First.First;
-        m_Wheels[2].GetComponent<Motor>().AngularSpeedAbsolute = speeds.First.Second;
-        m_Wheels[3].GetComponent<Motor>().AngularSpeedAbsolute = speeds.First.Second;
+        m_Wheels[0].GetComponent<Motor>().TargetAngularSpeedAbsolute = speeds.First.First;
+        m_Wheels[1].GetComponent<Motor>().TargetAngularSpeedAbsolute = speeds.First.First;
+        m_Wheels[2].GetComponent<Motor>().TargetAngularSpeedAbsolute = speeds.First.Second;
+        m_Wheels[3].GetComponent<Motor>().TargetAngularSpeedAbsolute = speeds.First.Second;
     }
 }

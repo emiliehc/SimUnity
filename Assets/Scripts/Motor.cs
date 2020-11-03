@@ -10,13 +10,31 @@ public class Motor : MonoBehaviour
     public float MaxAngularSpeed = 20.0f;
     public float MinAngularSpeed = -20.0f;
 
-    // DO NOT MODIFY, FOR EDITOR USE ONLY
-    public float m_AngularSpeed;
+    /// <summary>
+    /// DO NOT MODIFY, FOR EDITOR USE ONLY
+    /// </summary>
+    public bool InvertRotationDirection;
 
-    public float AngularSpeedAbsolute
+    /// <summary>
+    /// DO NOT MODIFY, FOR EDITOR USE ONLY
+    /// </summary>
+    public float TargetAngularSpeed;
+
+    /// <summary>
+    /// DO NOT MODIFY, FOR EDITOR USE ONLY
+    /// </summary>
+    public bool TargetAngularSpeedOverride;
+
+    public float TargetAngularSpeedAbsolute
     {
-        get => m_AngularSpeed;
-        set => m_AngularSpeed = Mathf.Clamp(value, MinAngularSpeed, MaxAngularSpeed);
+        get => TargetAngularSpeed;
+        set
+        {
+            if (!TargetAngularSpeedOverride)
+            {
+                TargetAngularSpeed = Mathf.Clamp(value, MinAngularSpeed, MaxAngularSpeed);
+            }
+        }
     }
 
     public float TestProp;
@@ -25,7 +43,7 @@ public class Motor : MonoBehaviour
     {
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.maxAngularVelocity = float.MaxValue;
-        
+
         InvokeRepeating("CheckWheelSpeed", 5.0f, 1.0f);
     }
 
@@ -33,7 +51,7 @@ public class Motor : MonoBehaviour
     {
         Rigidbody rb = GetComponent<Rigidbody>();
         float currentAngularSpeed = Vector3.Project(rb.angularVelocity, transform.forward).magnitude;
-        if (Mathf.Abs(currentAngularSpeed - Mathf.Abs(m_AngularSpeed)) > 1.0f)
+        if (Mathf.Abs(currentAngularSpeed - Mathf.Abs(TargetAngularSpeed)) > 1.0f)
         {
             Debug.LogWarning($"Wheel speed above / below from target: {currentAngularSpeed}");
         }
@@ -74,11 +92,11 @@ public class Motor : MonoBehaviour
         //        break;
         //    }
         //}
-        if (m_AngularSpeed > 0.0f)
+        if (TargetAngularSpeed > 0.0f)
         {
-            if (currentAngularSpeed < m_AngularSpeed)
+            if (currentAngularSpeed < TargetAngularSpeed)
             {
-                if (gameObject.name == "WheelRR" || gameObject.name == "WheelFR")
+                if (InvertRotationDirection)
                 {
                     rb.AddRelativeTorque(new Vector3(0.0f, 0.0f, -20.0f), ForceMode.Force);
                 }
@@ -89,20 +107,23 @@ public class Motor : MonoBehaviour
             }
         }
     }
-
 }
 
 [CustomEditor(typeof(Motor))]
 [CanEditMultipleObjects]
 public class MotorEditor : Editor
 {
-    SerializedProperty AngularSpeedAbsolute;
+    SerializedProperty InvertRotationDirection;
+    SerializedProperty TargetAngularSpeedOverride;
+    SerializedProperty TargetAngularSpeed;
     SerializedProperty MaxAngularSpeed;
     SerializedProperty MinAngularSpeed;
 
     void OnEnable()
     {
-        AngularSpeedAbsolute = serializedObject.FindProperty("m_AngularSpeed");
+        InvertRotationDirection = serializedObject.FindProperty("InvertRotationDirection");
+        TargetAngularSpeedOverride = serializedObject.FindProperty("TargetAngularSpeedOverride");
+        TargetAngularSpeed = serializedObject.FindProperty("TargetAngularSpeed");
         MaxAngularSpeed = serializedObject.FindProperty("MaxAngularSpeed");
         MinAngularSpeed = serializedObject.FindProperty("MinAngularSpeed");
     }
@@ -110,7 +131,9 @@ public class MotorEditor : Editor
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
-        EditorGUILayout.PropertyField(AngularSpeedAbsolute);
+        EditorGUILayout.PropertyField(InvertRotationDirection);
+        EditorGUILayout.PropertyField(TargetAngularSpeedOverride);
+        EditorGUILayout.PropertyField(TargetAngularSpeed);
         EditorGUILayout.PropertyField(MaxAngularSpeed);
         EditorGUILayout.PropertyField(MinAngularSpeed);
         serializedObject.ApplyModifiedProperties();
