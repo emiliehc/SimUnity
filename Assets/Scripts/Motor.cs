@@ -1,20 +1,25 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 
 public class Motor : MonoBehaviour
 {
-    public static readonly float MAX_ANGULAR_SPEED = 10.0f;
-    public static readonly float MIN_ANGULAR_SPEED = -10.0f;
+    public float MaxAngularSpeed = 20.0f;
+    public float MinAngularSpeed = -20.0f;
 
-    private float m_AngularSpeed;
+    // DO NOT MODIFY, FOR EDITOR USE ONLY
+    public float m_AngularSpeed;
 
     public float AngularSpeedAbsolute
     {
         get => m_AngularSpeed;
-        set => m_AngularSpeed = Mathf.Clamp(value, MIN_ANGULAR_SPEED, MAX_ANGULAR_SPEED);
+        set => m_AngularSpeed = Mathf.Clamp(value, MinAngularSpeed, MaxAngularSpeed);
     }
+
+    public float TestProp;
 
     void Start()
     {
@@ -85,4 +90,29 @@ public class Motor : MonoBehaviour
         }
     }
 
+}
+
+[CustomEditor(typeof(Motor))]
+[CanEditMultipleObjects]
+public class MotorEditor : Editor
+{
+    SerializedProperty AngularSpeedAbsolute;
+    SerializedProperty MaxAngularSpeed;
+    SerializedProperty MinAngularSpeed;
+
+    void OnEnable()
+    {
+        AngularSpeedAbsolute = serializedObject.FindProperty("m_AngularSpeed");
+        MaxAngularSpeed = serializedObject.FindProperty("MaxAngularSpeed");
+        MinAngularSpeed = serializedObject.FindProperty("MinAngularSpeed");
+    }
+
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+        EditorGUILayout.PropertyField(AngularSpeedAbsolute);
+        EditorGUILayout.PropertyField(MaxAngularSpeed);
+        EditorGUILayout.PropertyField(MinAngularSpeed);
+        serializedObject.ApplyModifiedProperties();
+    }
 }
