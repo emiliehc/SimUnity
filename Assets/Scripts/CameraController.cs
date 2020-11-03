@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -12,7 +13,8 @@ public class CameraController : MonoBehaviour
 {
     private Camera m_Camera;
     private bool m_MouseLocked;
-    private bool m_Sprinting;
+    public bool LockSprinting;
+    public bool Sprinting;
     private float m_Fov = 60.0f;
     private float m_FovTarget = 70.0f;
     private DateTime m_FovAnimationStartTime;
@@ -41,77 +43,78 @@ public class CameraController : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
         }
 
+        Vector4 input = GetUserInput();
+
+        if (Math.Abs(input.w - 1.0f) < 0.01f || LockSprinting)
+        {
+            if (!Sprinting)
+            {
+                Sprinting = true;
+                // start fov animation
+                m_FovAnimationStartTime = DateTime.Now;
+                m_DoFovAnimation = true;
+            }
+
+            if (m_DoFovAnimation)
+            {
+                TimeSpan deltaTime = DateTime.Now - m_FovAnimationStartTime;
+                if (deltaTime.Milliseconds < 75)
+                {
+                    // do animation
+                    m_Camera.fieldOfView = Mathf.Lerp(m_Fov, m_FovTarget, deltaTime.Milliseconds / 100.0f);
+                }
+                else
+                {
+                    m_DoFovAnimation = false;
+                }
+            }
+            else
+            {
+                m_Camera.fieldOfView = m_FovTarget;
+            }
+
+        }
+        else
+        {
+            if (Sprinting)
+            {
+                Sprinting = false;
+                m_Camera.fieldOfView = m_Fov;
+                // start fov animation
+                m_FovAnimationStartTime = DateTime.Now;
+                m_DoFovAnimation = true;
+            }
+
+            if (m_DoFovAnimation)
+            {
+                TimeSpan deltaTime = DateTime.Now - m_FovAnimationStartTime;
+                if (deltaTime.Milliseconds < 75)
+                {
+                    // do animation
+                    m_Camera.fieldOfView = Mathf.Lerp(m_FovTarget, m_Fov, deltaTime.Milliseconds / 100.0f);
+                }
+                else
+                {
+                    m_DoFovAnimation = false;
+                }
+            }
+            else
+            {
+                m_Camera.fieldOfView = m_Fov;
+            }
+        }
+
+        input *= 25.0f * Time.deltaTime;
+        if (Sprinting)
+        {
+            input *= 2.0f;
+        }
+
         if (m_MouseLocked)
         {
             m_Camera.transform.Rotate(Vector3.up, 300.0f * Time.deltaTime * Input.GetAxis("Mouse X"));
             m_Camera.transform.Rotate(Vector3.right, -300.0f * Time.deltaTime * Input.GetAxis("Mouse Y"));
-            Vector4 input = GetUserInput();
             
-            if (Math.Abs(input.w - 1.0f) < 0.01f)
-            {
-                if (!m_Sprinting)
-                {
-                    m_Sprinting = true;
-                    // start fov animation
-                    m_FovAnimationStartTime = DateTime.Now;
-                    m_DoFovAnimation = true;
-                }
-
-                if (m_DoFovAnimation)
-                {
-                    TimeSpan deltaTime = DateTime.Now - m_FovAnimationStartTime;
-                    if (deltaTime.Milliseconds < 75)
-                    {
-                        // do animation
-                        m_Camera.fieldOfView = Mathf.Lerp(m_Fov, m_FovTarget, deltaTime.Milliseconds / 100.0f);
-                    }
-                    else
-                    {
-                        m_DoFovAnimation = false;
-                    }
-                }
-                else
-                {
-                    m_Camera.fieldOfView = m_FovTarget;
-                }
-
-            }
-            else
-            {
-                if (m_Sprinting)
-                {
-                    m_Sprinting = false;
-                    m_Camera.fieldOfView = m_Fov;
-                    // start fov animation
-                    m_FovAnimationStartTime = DateTime.Now;
-                    m_DoFovAnimation = true;
-                }
-
-                if (m_DoFovAnimation)
-                {
-                    TimeSpan deltaTime = DateTime.Now - m_FovAnimationStartTime;
-                    if (deltaTime.Milliseconds < 75)
-                    {
-                        // do animation
-                        m_Camera.fieldOfView = Mathf.Lerp(m_FovTarget, m_Fov, deltaTime.Milliseconds / 100.0f);
-                    }
-                    else
-                    {
-                        m_DoFovAnimation = false;
-                    }
-                }
-                else
-                {
-                    m_Camera.fieldOfView = m_Fov;
-                }
-            }
-
-            input *= 25.0f * Time.deltaTime;
-            if (m_Sprinting)
-            {
-                input *= 2.0f;
-            }
-
             m_Camera.transform.Translate(new Vector3(0.0f, input.y, 0.0f), Space.World);
             m_Camera.transform.Translate(Vector3.ProjectOnPlane(m_Camera.transform.forward, Vector3.up).normalized * input.z, Space.World);
             m_Camera.transform.Translate(Vector3.ProjectOnPlane(m_Camera.transform.right, Vector3.up).normalized * input.x, Space.World);
@@ -159,5 +162,24 @@ public class CameraController : MonoBehaviour
         }
 
         return input;
+    }
+}
+
+[CustomEditor(typeof(CameraController))]
+[CanEditMultipleObjects]
+public class CameraControllerEditor : Editor
+{
+    private SerializedProperty LockSprinting;
+
+    void OnEnable()
+    {
+        LockSprinting = serializedObject.FindProperty("LockSprinting");
+    }
+
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+        EditorGUILayout.PropertyField(LockSprinting);
+        serializedObject.ApplyModifiedProperties();
     }
 }
