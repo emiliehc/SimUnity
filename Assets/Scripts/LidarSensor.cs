@@ -13,6 +13,9 @@ public class LidarSensor : MonoBehaviour
     float m_VertIncrement;
     float m_AzimutIncrAngle;
 
+    public bool DrawRaycast = false;
+
+    // TODO : consider using an array list for flexible size
     [HideInInspector] public float[] m_Distances;
     public float[] m_Azimuts;
 
@@ -47,7 +50,11 @@ public class LidarSensor : MonoBehaviour
                 if (Physics.Raycast(transform.position, dir, out hit, MaxRange))
                 {
                     m_Distances[indx] = (float) hit.distance;
-                    Debug.DrawRay(transform.position, dir * hit.distance, Color.green);
+                    if (DrawRaycast)
+                    {
+                        Debug.DrawRay(transform.position, dir * hit.distance,
+                            Color.Lerp(Color.red, Color.green, hit.distance / MaxRange));
+                    }
                 }
                 else
                 {
