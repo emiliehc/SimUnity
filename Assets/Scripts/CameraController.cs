@@ -112,13 +112,10 @@ public class CameraController : MonoBehaviour
                 input *= 2.0f;
             }
 
-            // up / down motion is absolute
             m_Camera.transform.Translate(new Vector3(0.0f, input.y, 0.0f), Space.World);
-            // forward / backward / left / right motion is relative to the plane parallel to the ground through the camera
             m_Camera.transform.Translate(Vector3.ProjectOnPlane(m_Camera.transform.forward, Vector3.up).normalized * input.z, Space.World);
             m_Camera.transform.Translate(Vector3.ProjectOnPlane(m_Camera.transform.right, Vector3.up).normalized * input.x, Space.World);
         }
-        // prevent rotation about the forward direction
         m_Camera.transform.rotation = Quaternion.Euler(m_Camera.transform.rotation.eulerAngles.x,
             m_Camera.transform.rotation.eulerAngles.y, 0.0f);
     }
