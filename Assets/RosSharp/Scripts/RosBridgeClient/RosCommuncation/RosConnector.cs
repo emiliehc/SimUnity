@@ -68,7 +68,7 @@ namespace RosSharp.RosBridgeClient
             }
         }
 
-        private void OnApplicationQuit()
+        public void OnApplicationQuit()
         {
             RosSocket.Close();
         }

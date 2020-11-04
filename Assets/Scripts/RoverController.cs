@@ -20,7 +20,7 @@ public class RoverController : MonoBehaviour
         m_Wheels[1] = GameObject.Find("WheelRL");
         m_Wheels[2] = GameObject.Find("WheelFR");
         m_Wheels[3] = GameObject.Find("WheelRR");
-        m_Socket = RosConnection.RosConnectionSocket;
+        m_Socket = RosConnection.RosSocket;
 
         m_Socket.Subscribe<WheelSpeed>("/WheelSpeed", speed =>
         {
