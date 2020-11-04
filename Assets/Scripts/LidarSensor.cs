@@ -17,7 +17,7 @@ public class LidarSensor : MonoBehaviour
 
     // TODO : consider using an array list for flexible size
     [HideInInspector] public float[] m_Distances;
-    public float[] m_Azimuts;
+    [HideInInspector] public float[] m_Azimuts;
 
 
     // Use this for initialization

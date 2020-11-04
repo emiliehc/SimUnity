@@ -76,34 +76,3 @@ public class Motor : MonoBehaviour
         }
     }
 }
-
-[CustomEditor(typeof(Motor))]
-[CanEditMultipleObjects]
-public class MotorEditor : Editor
-{
-    private SerializedProperty InvertRotationDirection;
-    private SerializedProperty TargetAngularSpeedOverride;
-    private SerializedProperty TargetAngularSpeed;
-    private SerializedProperty MaxAngularSpeed;
-    private SerializedProperty MinAngularSpeed;
-
-    void OnEnable()
-    {
-        InvertRotationDirection = serializedObject.FindProperty("InvertRotationDirection");
-        TargetAngularSpeedOverride = serializedObject.FindProperty("TargetAngularSpeedOverride");
-        TargetAngularSpeed = serializedObject.FindProperty("TargetAngularSpeed");
-        MaxAngularSpeed = serializedObject.FindProperty("MaxAngularSpeed");
-        MinAngularSpeed = serializedObject.FindProperty("MinAngularSpeed");
-    }
-
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
-        EditorGUILayout.PropertyField(InvertRotationDirection);
-        EditorGUILayout.PropertyField(TargetAngularSpeedOverride);
-        EditorGUILayout.PropertyField(TargetAngularSpeed);
-        EditorGUILayout.PropertyField(MaxAngularSpeed);
-        EditorGUILayout.PropertyField(MinAngularSpeed);
-        serializedObject.ApplyModifiedProperties();
-    }
-}

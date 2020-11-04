@@ -164,22 +164,3 @@ public class CameraController : MonoBehaviour
         return input;
     }
 }
-
-[CustomEditor(typeof(CameraController))]
-[CanEditMultipleObjects]
-public class CameraControllerEditor : Editor
-{
-    private SerializedProperty LockSprinting;
-
-    void OnEnable()
-    {
-        LockSprinting = serializedObject.FindProperty("LockSprinting");
-    }
-
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
-        EditorGUILayout.PropertyField(LockSprinting);
-        serializedObject.ApplyModifiedProperties();
-    }
-}
