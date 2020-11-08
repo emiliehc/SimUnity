@@ -15,6 +15,7 @@ public class RosConnection : MonoBehaviour
 {
     private RosSocket m_Socket;
     private RosConnector m_RosConnector;
+    public LidarSensor lidarSensor;
 
     public static RosSocket RosSocket
     {
@@ -73,8 +74,12 @@ public class RosConnection : MonoBehaviour
                 Debug.Log($"Velocity output of motor #{i} is {msg.MotorVel[i]}");
             }
         });
+
+        lidarSensor = GameObject.Find("Lidar").GetComponent<LidarSensor>();
+
+        m_Socket.Advertise<LidarData>("/LidarData");
         //m_Socket.Advertise<ProcessedControllerInput>("/processed_arm_controller_input");
-        m_Socket.Advertise<WheelSpeed>("/WheelSpeed");
+        //m_Socket.Advertise<WheelSpeed>("/WheelSpeed");
         //m_Socket.Advertise<WheelSpeed>("/TestTopic");
         //m_Socket.Subscribe<WheelSpeed>("/WheelSpeed", speed =>
         //{
@@ -102,10 +107,17 @@ public class RosConnection : MonoBehaviour
         //    ControllerInput = randomInput
         //});
 
-        m_Socket.Publish("/WheelSpeed", new WheelSpeed
+        //m_Socket.Publish("/WheelSpeed", new WheelSpeed
+        //{
+        //    Wheel_Speed = new[] { 5.0f, 5.0f }
+        //});
+
+        m_Socket.Publish("/LidarData", new LidarData
         {
-            Wheel_Speed = new[] { 5.0f, 5.0f }
+            distances = lidarSensor.getCurrentDistances(),
+            angle = lidarSensor.getCurrentAngle()
         });
+
 
         //m_Socket.Publish("/TestTopic", new Int32());
     }

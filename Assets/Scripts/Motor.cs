@@ -51,7 +51,7 @@ public class Motor : MonoBehaviour
         float currentAngularSpeed = Vector3.Project(rb.angularVelocity, transform.forward).magnitude;
         if (Mathf.Abs(currentAngularSpeed - Mathf.Abs(TargetAngularSpeed)) > 1.0f)
         {
-            Debug.LogWarning($"Wheel speed above / below from target: {currentAngularSpeed}");
+            // Debug.LogWarning($"Wheel speed above / below from target: {currentAngularSpeed}");
         }
     }
 
